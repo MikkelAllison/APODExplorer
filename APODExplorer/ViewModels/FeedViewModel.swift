@@ -1,6 +1,7 @@
 import SwiftUI
 import Combine
 
+/// A ViewModel responsible for fetching the past 30 day's APOD's (Astronomy Picture of the Day).
 class FeedViewModel: ObservableObject {
     @Published var apods: [APODInfo] = []
     

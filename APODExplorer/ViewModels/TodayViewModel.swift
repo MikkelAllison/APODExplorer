@@ -1,8 +1,11 @@
 import SwiftUI
 import Combine
 
+/// A ViewModel responsible for fetching today's APOD (Astronomy Picture of the Day).
 class TodayViewModel: ObservableObject {
     @Published var apod: APODInfo? = nil
+    @Published var errorMessage: String? = nil
+
 
     private let apodService: APODService
     
@@ -10,15 +13,15 @@ class TodayViewModel: ObservableObject {
          self.apodService = apodService
      }
 
-    func fetchTodayAPOD() {
+    func fetchDailyAPOD() {
         print("fetchTodayAPOD called")
-        apodService.fetchPictureOfTheDay { [weak self] result in
+        apodService.fetchDailyAPOD { [weak self] result in
             DispatchQueue.main.async {
                 switch result {
                 case .success(let info):
                     self?.apod = info
                 case .failure(let error):
-                    print("Error fetching APOD: \(error)")
+                    self?.errorMessage = "Error fetching APOD: \(error.localizedDescription)"
                 }
             }
         }

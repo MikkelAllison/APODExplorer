@@ -4,11 +4,12 @@ class APODService {
   
     let apiKey = "hDZehTug6rO5Ng9uEOvOjh2EdNWki8Led1D3vyWl"
  
-    func fetchPictureOfTheDay(completion: @escaping (Result<APODInfo, Error>) -> Void) {
+    /// Fetches the daily APOD from NASA's API.
+    func fetchDailyAPOD(completion: @escaping (Result<APODInfo, Error>) -> Void) {
       
         let baseURL = "https://api.nasa.gov/planetary/apod"
         guard var urlComponents = URLComponents(string: baseURL) else {
-            return
+            fatalError("Could not construct URLComponents with baseURL: \(baseURL)")
         }
         
         urlComponents.queryItems = [
@@ -24,6 +25,18 @@ class APODService {
                 completion(.failure(error))
                 return
             }
+            
+            if let httpResponse = response as? HTTPURLResponse {
+                   guard (200...299).contains(httpResponse.statusCode) else {
+                       let statusError = NSError(
+                           domain: "APODServiceError",
+                           code: httpResponse.statusCode,
+                           userInfo: [NSLocalizedDescriptionKey: "HTTP status code \(httpResponse.statusCode)"]
+                       )
+                       completion(.failure(statusError))
+                       return
+                   }
+               }
 
             guard let data = data else {
                 return
@@ -40,6 +53,7 @@ class APODService {
         task.resume()
     }
     
+    /// Fetches the APOD's from the past 30 days from NASA's API.
     func fetchRecentAPODs(
         startDate: String,
         endDate: String,

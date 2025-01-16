@@ -84,7 +84,7 @@ final class APODServiceTests: XCTestCase {
         
         let expectation = expectation(description: "Wait for fetchTodayAPOD to complete")
         
-        viewModel.fetchTodayAPOD()
+        viewModel.fetchDailyAPOD()
         
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
             XCTAssertEqual(viewModel.apod?.title, "Mock Title")
@@ -101,8 +101,40 @@ final class APODServiceTests: XCTestCase {
             
             let viewModel = TodayViewModel(apodService: mockService)
           
-            viewModel.fetchTodayAPOD()
+            viewModel.fetchDailyAPOD()
             
             XCTAssertNil(viewModel.apod)
         }
+    
+    func testLast30DaysDateRange() throws {
+        let service = APODService()
+        
+        guard let (startDateString, endDateString) = service.last30DaysDateRange() else {
+            XCTFail("last30DaysDateRange returned nil")
+            return
+        }
+  
+        XCTAssertEqual(startDateString.count, 10, "Start date string should match 'yyyy-MM-dd'")
+        XCTAssertEqual(endDateString.count, 10, "End date string should match 'yyyy-MM-dd'")
+
+        let formatter = DateFormatter()
+        formatter.dateFormat = "yyyy-MM-dd"
+        
+        guard let startDate = formatter.date(from: startDateString),
+              let endDate = formatter.date(from: endDateString) else {
+            XCTFail("Could not parse date strings from last30DaysDateRange")
+            return
+        }
+        
+        let calendar = Calendar.current
+        let difference = calendar.dateComponents([.day], from: startDate, to: endDate).day
+        
+        XCTAssertEqual(difference, 29, "Expected 29 days difference between start and end date")
+        
+        let today = calendar.startOfDay(for: Date())
+        let endDateStartOfDay = calendar.startOfDay(for: endDate)
+        XCTAssertLessThanOrEqual(abs(endDateStartOfDay.timeIntervalSince(today)), 24 * 60 * 60,
+                                 "End date should be near today's date.")
+    }
+
 }

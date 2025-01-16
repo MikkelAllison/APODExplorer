@@ -1,16 +1,12 @@
 import SwiftUI
 
 struct TodayView: View {
-    // 1. Create an instance of TodayViewModel
     @StateObject private var viewModel = TodayViewModel()
     
     var body: some View {
         VStack {
-            // 2. Check if `apod` is loaded
             if let apod = viewModel.apod {
-                // 3. Display the APOD data (title, explanation, image, etc.)
                 
-                // For example: AsyncImage (iOS 15+)
                 if let url = URL(string: apod.url) {
                     AsyncImage(url: url) { phase in
                         switch phase {
@@ -43,20 +39,17 @@ struct TodayView: View {
                 }
                 
             } else {
-                // 4. Show a loading indicator if `apod` is nil
                 ProgressView("Loading APOD...")
             }
         }
         .onAppear {
-            // 5. Fetch the APOD when the view appears
-            viewModel.fetchTodayAPOD()
+            viewModel.fetchDailyAPOD()
         }
     }
 }
 
 struct TodayView_Previews: PreviewProvider {
     static var previews: some View {
-        // Preview with a fresh instance of TodayView
         TodayView()
     }
 }

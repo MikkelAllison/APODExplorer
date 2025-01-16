@@ -6,7 +6,7 @@ class MockAPODService: APODService {
     var mockFetchPictureOfTheDayResult: Result<APODInfo, Error>?
     var mockFetchRecentAPODsResult: Result<[APODInfo], Error>?
 
-    override func fetchPictureOfTheDay(
+    override func fetchDailyAPOD(
         completion: @escaping (Result<APODInfo, Error>) -> Void
     ) {
         if let result = mockFetchPictureOfTheDayResult {
